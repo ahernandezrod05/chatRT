@@ -3,7 +3,7 @@ import Input from "@/app/components/Input/Input";
 //En NextJS 13 hay que especificar en los componentes si van a ser usados en el servidor o en el cliente
 //Ya que esto va a ser un formulario en el que vamos a usar varios Hooks de React como useEffect, hay que especificar que está en el cliente
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
 
 //Importando iconos de rect-icons
@@ -11,13 +11,18 @@ import { BsGithub } from "react-icons/bs";
 import { BsGoogle } from "react-icons/bs";
 
 import Button from "@/app/components/Button";
-import AuthSocialButton from "./AuthSocialButton";
 import { toast } from "react-hot-toast";
 
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+import { signIn, useSession } from "next-auth/react";
 //Los estados que va a tener el formulario. LOGIN o REGISTRO
 type Action = "LOGIN" | "REGISTRO";
 function AuthForm() {
+  //Hook de la session
+  const session = useSession();
+  //Router de NextJS
+  const router = useRouter();
   //Se le asigna los types de Action a este estado para que solo pueda tomar esos valores.
   const [action, setAction] = useState<Action>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +35,13 @@ function AuthForm() {
       setAction("LOGIN");
     }
   }, [action]);
+
+  //useEffect para que si detecta una session redirija a página de usuario
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/usuario");
+    }
+  }, [session?.status, router]);
 
   //Variables pertinentes al formulario con el hook useForm. se extraen las funciones "register", "handleSubmit", y los errores de "formState". Se asignan los valores por defecto del formulario
   const {
@@ -57,6 +69,7 @@ function AuthForm() {
       })
         .then((res) => {
           if (res.status !== 200) toast.error("Ha habido un error");
+          else signIn("credentials", data);
         })
         .finally(() => setIsLoading(false));
     }
@@ -67,37 +80,22 @@ function AuthForm() {
         redirect: false,
       })
         .then((callback) => {
-          console.log(callback);
+          //Aquí entra una vez se resuelva signIn y entra en el callback. Si hay algún error
+          //saltará el toast de error. Si no saltará el de Usuario existente
           if (callback?.error) {
             toast.error("El usuario introducido no existe");
           }
 
           if (callback?.ok && !callback?.error) {
-            toast.success("Usuario existe");
+            toast.success("Bienvenido!!");
+            router.push("/usuario");
           }
         })
         .finally(() => {
+          //pase lo que pase con la promesa de signIn, se vuelve a poner isLoading a false para que pueda volver a usar el formulario si hace falta
           setIsLoading(false);
         });
     }
-  };
-
-  const socialAction = (action: string) => {
-    setIsLoading(true);
-
-    signIn(action, { redirect: false })
-      .then((callback) => {
-        if (callback?.error) {
-          toast.error("Credenciales Incorrectas");
-        }
-
-        if (callback?.ok && !callback?.error) {
-          toast.success("Ha accedido sin problemas");
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
   };
 
   return (
@@ -149,18 +147,6 @@ function AuthForm() {
                 O utilice sus cuentas
               </span>
             </div>
-          </div>
-          <div className=" mt-6 flex gap-2">
-            <AuthSocialButton
-              icon={BsGithub}
-              onClick={() => socialAction("github")}
-            />
-          </div>
-          <div className=" mt-6 flex gap-2">
-            <AuthSocialButton
-              icon={BsGoogle}
-              onClick={() => socialAction("google")}
-            />
           </div>
 
           <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">

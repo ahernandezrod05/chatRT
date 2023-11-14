@@ -6,18 +6,18 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import prisma from "@/app/libs/prismadb";
-
+//Endpoint necesario para nextAuth. en providers se le pasa los proveedores de
+//Sesiones (en este caso, credenciales), adapter se le pasa si vamos a usar una BBDD para guardarlas (Prisma como conector en nuestro caso)
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
-    }),
+    /*Aquí configuramos las credenciales necesarias. Label es el nombre del campo, type el tipo
+    En authorize se configura la forma de autorizar al usuario. Básicamente si al enpoint llegan los datos sin email ni password se le manda un mensaje de error
+    Si está todo en orden, busca el email en la BD, y si la pass no coincide con la contraseña hasheada, manda otro mensaje de error
+
+    En isCorrect password usamos la librería bcrypt para comparar las contraseñas introducidas y guardadas
+    
+    */
     CredentialsProvider({
       name: "credentials",
       credentials: {
