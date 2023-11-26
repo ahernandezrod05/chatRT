@@ -9,6 +9,7 @@ const getMessages = async (chatId: string) => {
       },
       include: {
         sender: true,
+        seen: true,
       },
       orderBy: {
         createdAt: "asc",

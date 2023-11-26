@@ -41,6 +41,9 @@ const ChatBox: React.FC<ChatBoxProps> = ({ data, selected }) => {
     if (lastMessage?.body) {
       return lastMessage.body;
     }
+    if (lastMessage?.image) {
+      return "Envió una imagen";
+    }
 
     return "Ha empezado a chatear!";
   }, [lastMessage]);

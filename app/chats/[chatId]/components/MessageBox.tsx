@@ -4,6 +4,7 @@ import Avatar from "@/app/components/Avatar";
 import { MessageType } from "@/app/types";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 interface MessageBoxProps {
   data: MessageType;
@@ -32,13 +33,25 @@ export const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
             {/* {format(new Date(data.createdAt), "p")} */}
           </div>
         </div>
+        {/* Mensaje */}
         <div
           className={clsx(
-            "text-sm w-fit overflow-hidden rounded-full p-2",
-            isMine ? "bg-sky-500 text-white" : "bg-gray-100"
+            "text-sm w-fit overflow-hidden p-2",
+            isMine ? "bg-sky-500 text-white" : "bg-gray-100",
+            data.image ? "rounded-md p-0" : "rounded-full"
           )}
         >
-          <div>{data.body}</div>
+          {data?.image ? (
+            <Image
+              alt={`Imagen enviada por ${data?.sender?.email}`}
+              height={300}
+              width={300}
+              src={data.image}
+              className=" object-cover cursor-pointer hover:scale-110 transition"
+            />
+          ) : (
+            <div>{data.body}</div>
+          )}
         </div>
         {isLast && isMine && seenList.length > 0 && (
           <div

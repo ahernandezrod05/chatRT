@@ -16,6 +16,7 @@
     "clsx": "^2.0.0",
     "next": "latest",
     "next-auth": "^4.24.3",
+    "next-cloudinary": "^5.7.0",
     "next-superjson-plugin": "^0.5.10",
     "react": "latest",
     "react-dom": "latest",

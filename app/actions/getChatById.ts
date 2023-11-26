@@ -21,7 +21,7 @@ const getChatById = async (chatId: string) => {
 
     return chat;
   } catch (error: any) {
-    console.log(error, "SERVER_ERROR");
+    console.log("Ha habido un error en el server actions getChatById");
     return null;
   }
 };
