@@ -5,7 +5,7 @@ export default withAuth({
     signIn: "/",
   },
 });
-
+//Cuando la ruta coincida con esto, devuelve a la URL de Logout
 export const config = {
-  matcher: ["/usuario/:path*"],
+  matcher: ["/usuario/:path*", "/chats/:path*"],
 };

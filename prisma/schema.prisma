@@ -80,7 +80,7 @@ model Message {
       seen User[] @relation("Seen", fields: [seenIds], references: [id])
       
       chatIds String @db.ObjectId
-      chat Chat @relation(fields: [chatIds], references: [id])
+      chat Chat @relation(fields: [chatIds], references: [id], onDelete: Cascade)
 
       senderId String @db.ObjectId
       sender User @relation(fields: [senderId], references: [id])

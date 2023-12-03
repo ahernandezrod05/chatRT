@@ -7,6 +7,8 @@ import useOtherUser from "@/app/hooks/useOtherUser";
 import Avatar from "@/app/components/Avatar";
 import Link from "next/link";
 import { FaCaretLeft } from "react-icons/fa";
+import ProfileDrawer from "./ProfileDrawer";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 
 interface HeaderProps {
   chat: Chat & {
@@ -17,9 +19,24 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ chat }) => {
   const otherUser = useOtherUser(chat);
 
+  const statusText = useMemo(() => {
+    if (chat.isGroup) return `${chat.users.length} miembros`;
+    return "En línea";
+  }, [chat]);
+
+  const [openDrawer, setOpenDrawer] = useState(false);
+
   return (
-    <div
-      className="
+    <>
+      <ProfileDrawer
+        data={chat}
+        isOpen={openDrawer}
+        onClose={() => {
+          setOpenDrawer(false);
+        }}
+      />
+      <div
+        className="
   bg-white 
   w-full 
   flex 
@@ -32,11 +49,11 @@ const Header: React.FC<HeaderProps> = ({ chat }) => {
   items-center 
   shadow-sm
 "
-    >
-      <div className="flex gap-3 items-center">
-        <Link
-          href="/chats"
-          className="
+      >
+        <div className="flex gap-3 items-center">
+          <Link
+            href="/chats"
+            className="
             lg:hidden 
             block 
             text-sky-500 
@@ -44,15 +61,24 @@ const Header: React.FC<HeaderProps> = ({ chat }) => {
             transition 
             cursor-pointer
           "
-        >
-          <FaCaretLeft size={30} />
-        </Link>
-        <Avatar user={otherUser} />
-        <div className="flex flex-col">
-          <div>{otherUser.name}</div>
+          >
+            <FaCaretLeft size={30} />
+          </Link>
+          <Avatar user={otherUser} />
+          <div className="flex flex-col">
+            <div>{chat.name || otherUser.name}</div>
+            <div className="text-sm font-light text-neutral-600">
+              {statusText}
+            </div>
+          </div>
         </div>
+        <HiEllipsisHorizontal
+          size={30}
+          onClick={() => setOpenDrawer(true)}
+          className="text-sky-800 cursor-pointer hover:text-sky-600 transition"
+        />
       </div>
-    </div>
+    </>
   );
 };
 
