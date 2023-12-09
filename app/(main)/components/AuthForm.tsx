@@ -1,5 +1,5 @@
 "use client";
-import Input from "@/app/components/Input/Input";
+import Input from "@/app/components/Inputs/Input";
 //En NextJS 13 hay que especificar en los componentes si van a ser usados en el servidor o en el cliente
 //Ya que esto va a ser un formulario en el que vamos a usar varios Hooks de React como useEffect, hay que especificar que está en el cliente
 
@@ -87,7 +87,7 @@ function AuthForm() {
           }
 
           if (callback?.ok && !callback?.error) {
-            toast.success("Bienvenido!!");
+            toast.success("¡¡Bienvenido!!");
             router.push("/usuario");
           }
         })

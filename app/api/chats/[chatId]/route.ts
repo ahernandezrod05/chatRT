@@ -1,6 +1,7 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 
 interface Params {
   chatId?: string;
@@ -33,6 +34,11 @@ export async function DELETE(req: Request, { params }: { params: Params }) {
           hasSome: [currentUser.id],
         },
       },
+    });
+
+    chatExists.users.forEach((user) => {
+      if (user.email)
+        pusherServer.trigger(user.email, "chat:delete", chatExists);
     });
 
     return NextResponse.json(deletedChat);

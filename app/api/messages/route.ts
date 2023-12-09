@@ -1,6 +1,7 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 //Endpoint que añade un mensaje a un chat cada vez que se envía.
 //TODO: Hacer que funcione en tiempo real.
 export async function POST(req: Request) {
@@ -57,6 +58,17 @@ export async function POST(req: Request) {
           },
         },
       },
+    });
+
+    await pusherServer.trigger(chatId, "messages:new", newMessage);
+
+    const lastMessage = updateChat.messages[updateChat.messages.length - 1];
+
+    updateChat.users.map((user) => {
+      pusherServer.trigger(user.email!, "chat:update", {
+        id: chatId,
+        messages: [lastMessage],
+      });
     });
 
     return NextResponse.json(newMessage);

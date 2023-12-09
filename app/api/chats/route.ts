@@ -1,6 +1,7 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 //Endpoint que mete en la base de datos el chat que se crea cuando clickamos a un usuario en la lista.
 //TODO: Añadir funcionalidad de chat grupal
 export async function POST(req: Request) {
@@ -36,6 +37,9 @@ export async function POST(req: Request) {
         },
       });
 
+      newChat.users.forEach((user) => {
+        if (user.email) pusherServer.trigger(user.email, "chat:new", newChat);
+      });
       return NextResponse.json(newChat);
     }
 
@@ -81,7 +85,9 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log({ newChat, existingChat });
+    newChat.users.map((user) => {
+      if (user.email) pusherServer.trigger(user.email, "chat:new", newChat);
+    });
 
     return NextResponse.json(newChat);
   } catch (error: any) {

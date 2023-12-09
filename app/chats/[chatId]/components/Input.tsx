@@ -23,7 +23,7 @@ const Input: React.FC<InputProps> = ({
       <input
         id={id}
         type={type}
-        autoComplete={id}
+        autoComplete={"off"}
         {...register(id, { required })}
         placeholder={placeholder}
         className="text-black font-light py-2 px-4 bg-neutral-100 w-full rounded-full focus:outline-none"

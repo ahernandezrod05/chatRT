@@ -9,6 +9,8 @@ import Link from "next/link";
 import { FaCaretLeft } from "react-icons/fa";
 import ProfileDrawer from "./ProfileDrawer";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
+import AvatarGroup from "@/app/components/AvatarGroup";
+import useActiveList from "@/app/hooks/useActiveList";
 
 interface HeaderProps {
   chat: Chat & {
@@ -19,12 +21,14 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ chat }) => {
   const otherUser = useOtherUser(chat);
 
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const { members } = useActiveList();
+  const isActive = members.indexOf(otherUser?.email!) !== -1;
+
   const statusText = useMemo(() => {
     if (chat.isGroup) return `${chat.users.length} miembros`;
-    return "En línea";
-  }, [chat]);
-
-  const [openDrawer, setOpenDrawer] = useState(false);
+    return isActive ? "En línea" : "Desconectado";
+  }, [chat, isActive]);
 
   return (
     <>
@@ -64,7 +68,11 @@ const Header: React.FC<HeaderProps> = ({ chat }) => {
           >
             <FaCaretLeft size={30} />
           </Link>
-          <Avatar user={otherUser} />
+          {chat.isGroup ? (
+            <AvatarGroup users={chat.users} />
+          ) : (
+            <Avatar user={otherUser} />
+          )}
           <div className="flex flex-col">
             <div>{chat.name || otherUser.name}</div>
             <div className="text-sm font-light text-neutral-600">

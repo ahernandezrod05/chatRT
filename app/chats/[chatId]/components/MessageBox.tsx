@@ -1,10 +1,12 @@
 "use client";
 
 import Avatar from "@/app/components/Avatar";
+import Modal from "@/app/components/Modals/Modal";
 import { MessageType } from "@/app/types";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface MessageBoxProps {
   data: MessageType;
@@ -21,6 +23,7 @@ export const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
     .map((user) => user.name)
     .join(", ");
 
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   return (
     <div className={clsx("flex gap-2 p-4", isMine && "justify-end")}>
       <div className={clsx(isMine && "order-2")}>
@@ -41,11 +44,30 @@ export const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
             data.image ? "rounded-md p-0" : "rounded-full"
           )}
         >
+          <Modal
+            onClose={() => {
+              setIsImageModalOpen(false);
+            }}
+            isOpen={isImageModalOpen}
+          >
+            <div className="h-80 w-80 ">
+              {/* Este error de aquí no afecta en nada, es un error de Typescript que dice que el src no puede ser nulo, pero nunca lo será ya que solo se puede abrir si tiene imagen el mensaje */}
+              <Image
+                className="object-contain"
+                src={data.image ?? "/image/placeholder_image_not_found.jpg"}
+                fill
+                alt={`Imagen enviada por el usuario ${data.sender.name}`}
+              />
+            </div>
+          </Modal>
           {data?.image ? (
             <Image
               alt={`Imagen enviada por ${data?.sender?.email}`}
               height={300}
               width={300}
+              onClick={() => {
+                setIsImageModalOpen(true);
+              }}
               src={data.image}
               className=" object-cover cursor-pointer hover:scale-110 transition"
             />

@@ -1,6 +1,8 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
+import { update } from "lodash";
 
 interface Params {
   chatId?: string;
@@ -36,7 +38,7 @@ export async function POST(req: Request, { params }: { params: Params }) {
     const lastMessage = chat.messages[chat.messages.length - 1];
 
     if (!lastMessage) return NextResponse.json(chat);
-    //Si existe lo actualizamos si existe para que esté a visto
+    //Si existe lo actualizamos para que esté a visto
 
     const updatedMessage = await prisma.message.update({
       where: {
@@ -54,6 +56,16 @@ export async function POST(req: Request, { params }: { params: Params }) {
         },
       },
     });
+
+    await pusherServer.trigger(currentUser.email, "chat:update", {
+      id: chatId,
+      messages: [updatedMessage],
+    });
+
+    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+      return NextResponse.json(chat);
+    }
+    await pusherServer.trigger(chatId!, "message:update", updatedMessage);
 
     return NextResponse.json(updatedMessage);
   } catch (error: any) {

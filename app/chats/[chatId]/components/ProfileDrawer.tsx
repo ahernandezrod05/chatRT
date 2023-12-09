@@ -6,6 +6,7 @@ import { Chat, User } from "@prisma/client";
 import { Fragment, useMemo, useState } from "react";
 import { IoClose, IoTrash } from "react-icons/io5";
 import ConfirmModal from "./ConfirmModal";
+import useActiveList from "@/app/hooks/useActiveList";
 interface ProfileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +24,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const otherUser = useOtherUser(data);
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
   //Aquí formateo la fecha de creación de la cuenta. Si no tiene por lo que sea, muestra un mensaje de error.
+  const { members } = useActiveList();
+  const isActive = members.indexOf(otherUser?.email!) !== -1;
   const signInDate = useMemo(() => {
     if (otherUser?.createdAt) {
       return new Date(otherUser.createdAt).toLocaleDateString("es-ES", {
@@ -43,8 +46,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   //TODO: Agregar estado basado en conexión.
   const statusText = useMemo(() => {
     if (data.isGroup) return `${data.users.length} miembros`;
-    return "En línea";
-  }, [data]);
+    return isActive ? "En línea" : "Desconectado";
+  }, [data, isActive]);
 
   return (
     <>

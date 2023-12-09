@@ -6,7 +6,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { User } from "@prisma/client";
 import { CldUploadButton } from "next-cloudinary";
 
-import Input from "../Input/Input";
+import Input from "../Inputs/Input";
 import Modal from "../Modals/Modal";
 import Button from "../Button";
 import Image from "next/image";
@@ -97,7 +97,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="mt-10 flex flex-col gap-y-8">
               <Input
                 disabled={isLoading}
-                label="Name"
+                label="Nombre"
                 id="name"
                 errors={errors}
                 required
